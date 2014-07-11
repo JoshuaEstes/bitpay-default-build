@@ -1,0 +1,18 @@
+{
+    "name": "bitpay/default-build",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "require": {},
+    "require-dev": {
+        "phpmd/phpmd": "*",
+        "phing/phing": "*",
+        "pdepend/pdepend" : "1.1.0",
+        "squizlabs/php_codesniffer": "*",
+        "phpunit/phpunit": "*",
+        "phploc/phploc": "*",
+        "phpunit/phpunit-skeleton-generator": "*"
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}

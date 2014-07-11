@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2011-2014 BitPay LLC
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+ -->
+<project name="bitpay/build-script" default="build">
+    <!--
+        Default properties
+    -->
+    <property file="${project.basedir}/build/build.properties" />
+
+    <!--
+        Default build for running a build locally
+    -->
+    <target name="build" depends="prepare">
+        <phingcall target="lint" />
+        <phingcall target="phpunit" />
+        <phingcall target="phpcs" />
+        <phingcall target="phpmd" />
+        <phingcall target="phploc" />
+        <phingcall target="pdepend" />
+    </target>
+
+    <!--
+        Build API and other documentation
+    -->
+    <target name="build-docs">
+        <echo msg="todo" />
+    </target>
+
+    <!--
+        Used to run a build on Travis CI
+    -->
+    <target name="build-travis" depends="prepare">
+        <phingcall target="lint" />
+        <phingcall target="phpunit" />
+        <phingcall target="ocular:code-coverage:upload" />
+    </target>
+
+    <!--
+        Cleans up and makes sure that the build is
+        clean
+    -->
+    <target name="clean" hidden="true">
+        <delete dir="build/logs" verbose="true" />
+    </target>
+
+    <!--
+        Prepares the project for a build
+    -->
+    <target name="prepare" depends="clean" hidden="true">
+        <mkdir dir="build/cache" />
+        <mkdir dir="build/logs" />
+    </target>
+
+    <!--
+        Lint check all php files, this task should be updated for each
+        project so it only lint checks files specific for that project
+    -->
+    <target name="lint">
+        <phplint cachefile="${project.basedir}/build/cache/phplint.cache">
+            <fileset dir="${project.basedir}">
+                <include name="**/*.php"/>
+            </fileset>
+        </phplint>
+    </target>
+
+    <!--
+        phpunit - Runs phpunit with the phpunit.xml.dist file
+    -->
+    <target name="phpunit">
+        <exec executable="${project.basedir}/bin/phpunit" passthru="true">
+            <arg value="-c" />
+            <arg value="${project.basedir}/build" />
+        </exec>
+    </target>
+
+    <!--
+        PHP Mess Detector
+        http://phpmd.org
+    -->
+    <target name="phpmd">
+        <exec executable="${project.basedir}/bin/phpmd" passthru="true">
+            <arg value="${project.basedir}/requirements.php" />
+            <arg value="text" />
+            <arg value="codesize" />
+            <arg value="--exclude=${project.basedir}/vendor,${project.basedir}/build" />
+        </exec>
+    </target>
+
+    <!--
+        PHP Lines of Code
+        https://github.com/sebastianbergmann/phploc
+    -->
+    <target name="phploc">
+        <exec executable="${project.basedir}/bin/phploc" passthru="true">
+            <arg value="--exclude=${project.basedir}/bin/" />
+            <arg value="--exclude=${project.basedir}/build/" />
+            <arg value="--exclude=${project.basedir}/vendor/" />
+            <arg value="--log-csv=${project.basedir}/build/logs/phploc.csv" />
+            <arg value="--log-xml=${project.basedir}/build/logs/phploc.xml" />
+            <arg value="--git-repository=${project.basedir}" />
+            <arg value="--no-interaction" />
+            <arg value="--progress" />
+            <arg value="${project.basedir}" />
+        </exec>
+    </target>
+
+    <!--
+        PHP Depend
+    -->
+    <target name="pdepend">
+        <exec executable="${project.basedir}/bin/pdepend" passthru="true">
+            <arg value="--jdepend-chart=${project.basedir}/build/logs/jdepend_chart.svg" />
+            <arg value="--jdepend-xml=${project.basedir}/build/logs/jdepend.xml" />
+            <arg value="--overview-pyramid=${project.basedir}/build/logs/pyramid.svg" />
+            <arg value="--summary-xml=${project.basedir}/build/logs/jdepend_summary.xml" />
+            <arg value="--ignore=${project.basedir}/vendor,${project.basedir}/build/" />
+            <arg value="${project.basedir}" />
+        </exec>
+    </target>
+
+    <!--
+        PHP Code Sniffer - Makes sure the code meets standards, this
+        needs to be updated for each project
+    -->
+    <target name="phpcs">
+        <delete file="${project.basedir}/build/logs/phpcs.xml" />
+        <exec executable="${project.basedir}/bin/phpcs" passthru="true">
+            <arg value="-p" /> <!-- Show progress of run -->
+            <arg value="--report-xml=${project.basedir}/build/logs/phpcs.xml" />
+            <arg value="--standard=PSR1" />
+            <arg value="--standard=PSR2" />
+            <arg value="--ignore=${project.basedir}/vendor/" />
+            <arg value="${project.basedir}/" />
+        </exec>
+    </target>
+
+    <!--
+    -->
+    <target name="scrutinizer:ocular:download">
+        <if>
+            <not>
+                <available file="ocular.phar" />
+            </not>
+            <then>
+                <exec executable="wget" passthru="true">
+                    <arg value="https://scrutinizer-ci.com/ocular.phar" />
+                </exec>
+            </then>
+        </if>
+    </target>
+
+    <!--
+    -->
+    <target name="ocular:code-coverage:upload" depends="scrutinizer:ocular:download">
+        <exec executable="ocular.phar">
+            <arg value="code-coverage:upload" />
+            <arg value="--format=php-clover" />
+            <arg value="build/logs/clover.xml" />
+        </exec>
+    </target>
+</project>

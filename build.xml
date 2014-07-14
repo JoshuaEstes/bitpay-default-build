@@ -47,7 +47,7 @@
     <!--
         Build API and other documentation
     -->
-    <target name="build-docs">
+    <target name="build-api-docs">
         <exec executable="${project.basedir}/bin/phpdoc" passthru="true">
             <arg value="-d" />
             <arg path="${project.basedir}" />

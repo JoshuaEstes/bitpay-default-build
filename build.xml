@@ -171,29 +171,4 @@
             <arg path="${phpcs.source}" />
         </exec>
     </target>
-
-    <!--
-    -->
-    <target name="scrutinizer:ocular:download" hidden="true">
-        <if>
-            <not>
-                <available file="ocular.phar" />
-            </not>
-            <then>
-                <exec executable="wget" passthru="true">
-                    <arg value="https://scrutinizer-ci.com/ocular.phar" />
-                </exec>
-            </then>
-        </if>
-    </target>
-
-    <!--
-    -->
-    <target name="ocular:code-coverage:upload" depends="scrutinizer:ocular:download" hidden="true">
-        <exec executable="ocular.phar">
-            <arg value="code-coverage:upload" />
-            <arg value="--format=php-clover" />
-            <arg value="build/logs/clover.xml" />
-        </exec>
-    </target>
 </project>

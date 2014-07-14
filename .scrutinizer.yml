@@ -39,10 +39,6 @@ filter:
         - vendor/*
 
 tools:
-    # Travis CI runs phpunit and creates the code coverage report
-    external_code_coverage:
-        timeout: 300
-        runs: 1
     php_analyzer: true
     php_changetracking: true
     php_code_sniffer:

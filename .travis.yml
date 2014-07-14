@@ -31,3 +31,4 @@ cache:
     directories:
         - build/cache/
         - vendor/
+        - ocular.phar

@@ -5,6 +5,7 @@
     "require": {},
     "require-dev": {
         "phpmd/phpmd": "*",
+        "phpdocumentor/phpdocumentor": "*",
         "phing/phing": "*",
         "pdepend/pdepend" : "1.1.0",
         "squizlabs/php_codesniffer": "*",

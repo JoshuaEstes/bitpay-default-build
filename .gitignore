@@ -1,5 +1,6 @@
 /bin/
 /build/cache/
+/build/docs/
 /build/logs/
 /vendor/
 composer.lock

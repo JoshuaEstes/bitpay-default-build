@@ -48,7 +48,14 @@
         Build API and other documentation
     -->
     <target name="build-docs">
-        <echo msg="todo" />
+        <exec executable="${project.basedir}/bin/phpdoc" passthru="true">
+            <arg value="-d" />
+            <arg path="${project.basedir}" />
+            <arg value="-t" />
+            <arg path="${project.basedir}/build/docs" />
+            <arg value="-i" />
+            <arg value="${project.basedir}/vendor/" />
+        </exec>
     </target>
 
     <!--
@@ -164,7 +171,7 @@
 
     <!--
     -->
-    <target name="scrutinizer:ocular:download">
+    <target name="scrutinizer:ocular:download" hidden="true">
         <if>
             <not>
                 <available file="ocular.phar" />
@@ -179,7 +186,7 @@
 
     <!--
     -->
-    <target name="ocular:code-coverage:upload" depends="scrutinizer:ocular:download">
+    <target name="ocular:code-coverage:upload" depends="scrutinizer:ocular:download" hidden="true">
         <exec executable="ocular.phar">
             <arg value="code-coverage:upload" />
             <arg value="--format=php-clover" />

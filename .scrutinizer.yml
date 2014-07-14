@@ -47,7 +47,8 @@ tools:
     php_changetracking: true
     php_code_sniffer:
         enabled: true
-        standard: PSR2
+        config:
+            standard: PSR2
     php_mess_detector:
         config:
             ruleset: build/ruleset/phpmd.xml

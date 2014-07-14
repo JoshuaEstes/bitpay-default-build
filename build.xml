@@ -36,10 +36,12 @@
     <target name="build" depends="prepare">
         <phingcall target="lint" />
         <phingcall target="phpunit" />
-        <phingcall target="phpcs" />
-        <phingcall target="phpmd" />
-        <phingcall target="phploc" />
-        <phingcall target="pdepend" />
+        <parallel threadCount="4">
+            <phingcall target="phpcs" />
+            <phingcall target="phpmd" />
+            <phingcall target="phploc" />
+            <phingcall target="pdepend" />
+        </parallel>
     </target>
 
     <!--
@@ -52,9 +54,8 @@
     <!--
         Used to run a build on Travis CI
     -->
-    <target name="build-travis" depends="prepare">
-        <phingcall target="lint" />
-        <phingcall target="phpunit" />
+    <target name="build-travis" hidden="true">
+        <phingcall target="build" />
         <phingcall target="ocular:code-coverage:upload" />
     </target>
 
@@ -63,6 +64,7 @@
         clean
     -->
     <target name="clean" hidden="true">
+        <delete dir="build/docs" verbose="true" />
         <delete dir="build/logs" verbose="true" />
     </target>
 
@@ -80,19 +82,23 @@
     -->
     <target name="lint">
         <phplint cachefile="${project.basedir}/build/cache/phplint.cache">
-            <fileset dir="${project.basedir}">
+            <fileset dir="${project.basedir}/">
                 <include name="**/*.php"/>
+                <exclude name="**/build/**"/>
+                <exclude name="**/bin/**"/>
+                <exclude name="**/vendor/**"/>
             </fileset>
         </phplint>
     </target>
 
     <!--
         phpunit - Runs phpunit with the phpunit.xml.dist file
+        http://phpunit.de/
     -->
     <target name="phpunit">
         <exec executable="${project.basedir}/bin/phpunit" passthru="true">
             <arg value="-c" />
-            <arg value="${project.basedir}/build" />
+            <arg path="${project.basedir}/build" />
         </exec>
     </target>
 
@@ -120,15 +126,13 @@
             <arg value="--exclude=${project.basedir}/vendor/" />
             <arg value="--log-csv=${project.basedir}/build/logs/phploc.csv" />
             <arg value="--log-xml=${project.basedir}/build/logs/phploc.xml" />
-            <arg value="--git-repository=${project.basedir}" />
-            <arg value="--no-interaction" />
-            <arg value="--progress" />
-            <arg value="${project.basedir}" />
+            <arg path="${project.basedir}" />
         </exec>
     </target>
 
     <!--
         PHP Depend
+        http://pdepend.org/
     -->
     <target name="pdepend">
         <exec executable="${project.basedir}/bin/pdepend" passthru="true">
@@ -137,13 +141,14 @@
             <arg value="--overview-pyramid=${project.basedir}/build/logs/pyramid.svg" />
             <arg value="--summary-xml=${project.basedir}/build/logs/jdepend_summary.xml" />
             <arg value="--ignore=${project.basedir}/vendor,${project.basedir}/build/" />
-            <arg value="${project.basedir}" />
+            <arg path="${project.basedir}" />
         </exec>
     </target>
 
     <!--
         PHP Code Sniffer - Makes sure the code meets standards, this
         needs to be updated for each project
+        https://github.com/squizlabs/PHP_CodeSniffer
     -->
     <target name="phpcs">
         <delete file="${project.basedir}/build/logs/phpcs.xml" />

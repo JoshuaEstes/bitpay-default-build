@@ -36,11 +36,12 @@
     <target name="build" depends="prepare">
         <phingcall target="lint" />
         <phingcall target="phpunit" />
-        <parallel threadCount="4">
+        <parallel threadCount="5">
             <phingcall target="phpcs" />
             <phingcall target="phpmd" />
             <phingcall target="phploc" />
             <phingcall target="pdepend" />
+            <phingcall target="phpdoc" />
         </parallel>
     </target>
 
@@ -48,13 +49,11 @@
         Build API and other documentation
     -->
     <target name="build-api-docs">
-        <exec executable="${project.basedir}/bin/phpdoc" passthru="true">
-            <arg value="-d" />
-            <arg path="${project.basedir}" />
-            <arg value="-t" />
-            <arg path="${project.basedir}/build/docs" />
-            <arg value="-i" />
-            <arg value="${project.basedir}/vendor/" />
+        <delete dir="${phpdoc.target}" verbose="true" />
+        <exec executable="${project.bindir}/phpdoc" passthru="true">
+            <arg value="--directory=${phpdoc.directory}" />
+            <arg value="--target=${phpdoc.target}" />
+            <arg line="--ignore=${phpdoc.ignore}" />
         </exec>
     </target>
 
@@ -103,9 +102,9 @@
         http://phpunit.de/
     -->
     <target name="phpunit">
-        <exec executable="${project.basedir}/bin/phpunit" passthru="true">
+        <exec executable="${project.bindir}/phpunit" passthru="true">
             <arg value="-c" />
-            <arg path="${project.basedir}/build" />
+            <arg path="${phpunit.configuration}" />
         </exec>
     </target>
 
@@ -114,26 +113,29 @@
         http://phpmd.org
     -->
     <target name="phpmd">
-        <exec executable="${project.basedir}/bin/phpmd" passthru="true">
-            <arg value="${project.basedir}/requirements.php" />
-            <arg value="text" />
-            <arg value="codesize" />
-            <arg value="--exclude=${project.basedir}/vendor,${project.basedir}/build" />
+        <delete file="${phpmd.report.file}" />
+        <exec executable="${project.bindir}/phpmd" passthru="true">
+            <arg path="${phpmd.source}" />
+            <arg value="${phpmd.report.format}" />
+            <arg value="${phpmd.ruleset}" />
+            <arg line="--reportfile ${phpmd.report.file}" />
+            <arg line="--exclude ${phpmd.exclude}" />
         </exec>
     </target>
 
     <!--
-        PHP Lines of Code
+        PHP Lines of Code - Generates a CSV and XML log of how many lines
+        the project is.
         https://github.com/sebastianbergmann/phploc
     -->
     <target name="phploc">
+        <delete file="${phploc.log.csv}" />
+        <delete file="${phploc.log.xml}" />
         <exec executable="${project.basedir}/bin/phploc" passthru="true">
-            <arg value="--exclude=${project.basedir}/bin/" />
-            <arg value="--exclude=${project.basedir}/build/" />
-            <arg value="--exclude=${project.basedir}/vendor/" />
-            <arg value="--log-csv=${project.basedir}/build/logs/phploc.csv" />
-            <arg value="--log-xml=${project.basedir}/build/logs/phploc.xml" />
-            <arg path="${project.basedir}" />
+            <arg line="--exclude=${phploc.exclude}" />
+            <arg value="--log-csv=${phploc.log.csv}" />
+            <arg value="--log-xml=${phploc.log.xml}" />
+            <arg path="${phploc.source}" />
         </exec>
     </target>
 
@@ -142,13 +144,15 @@
         http://pdepend.org/
     -->
     <target name="pdepend">
-        <exec executable="${project.basedir}/bin/pdepend" passthru="true">
-            <arg value="--jdepend-chart=${project.basedir}/build/logs/jdepend_chart.svg" />
-            <arg value="--jdepend-xml=${project.basedir}/build/logs/jdepend.xml" />
-            <arg value="--overview-pyramid=${project.basedir}/build/logs/pyramid.svg" />
-            <arg value="--summary-xml=${project.basedir}/build/logs/jdepend_summary.xml" />
-            <arg value="--ignore=${project.basedir}/vendor,${project.basedir}/build/" />
-            <arg path="${project.basedir}" />
+        <delete file="${pdepend.jdepend.xml}" />
+        <delete file="${pdepend.summary.xml}" />
+        <exec executable="${project.bindir}/pdepend" passthru="true">
+            <arg value="--jdepend-chart=${pdepend.jdepend.chart}" />
+            <arg value="--jdepend-xml=${pdepend.jdepend.xml}" />
+            <arg value="--overview-pyramid=${pdepend.overview.pyramid}" />
+            <arg value="--summary-xml=${pdepend.summary.xml}" />
+            <arg value="--ignore=${pdepend.ignore}" />
+            <arg path="${pdepend.source}" />
         </exec>
     </target>
 
@@ -158,14 +162,13 @@
         https://github.com/squizlabs/PHP_CodeSniffer
     -->
     <target name="phpcs">
-        <delete file="${project.basedir}/build/logs/phpcs.xml" />
-        <exec executable="${project.basedir}/bin/phpcs" passthru="true">
+        <delete file="${phpcs.report.xml}" />
+        <exec executable="${project.bindir}/phpcs" passthru="true">
             <arg value="-p" /> <!-- Show progress of run -->
-            <arg value="--report-xml=${project.basedir}/build/logs/phpcs.xml" />
-            <arg value="--standard=PSR1" />
-            <arg value="--standard=PSR2" />
-            <arg value="--ignore=${project.basedir}/vendor/" />
-            <arg value="${project.basedir}/" />
+            <arg value="--report-xml=${phpcs.report.xml}" />
+            <arg line="--standard=${phpcs.standard}" />
+            <arg line="--ignore=${phpcs.ignore}" />
+            <arg path="${phpcs.source}" />
         </exec>
     </target>
 

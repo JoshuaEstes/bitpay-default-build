@@ -33,7 +33,8 @@
     <!--
         Default build for running a build locally
     -->
-    <target name="build" depends="prepare">
+    <target name="build" depends="prepare"
+        description="Runs a full build">
         <phingcall target="lint" />
         <phingcall target="phpunit" />
         <parallel threadCount="5">
@@ -48,7 +49,8 @@
     <!--
         Build API and other documentation
     -->
-    <target name="build-api-docs">
+    <target name="build-api-docs" depends="prepare"
+        description="Generates API docs for the project">
         <delete dir="${phpdoc.target}" verbose="true" />
         <exec executable="${project.bindir}/phpdoc" passthru="true">
             <arg value="--directory=${phpdoc.directory}" />
@@ -60,9 +62,9 @@
     <!--
         Used to run a build on Travis CI
     -->
-    <target name="build-travis" hidden="true">
+    <target name="build-travis" hidden="true"
+        description="Runs a build that is specific to the Travis CI environment">
         <phingcall target="build" />
-        <phingcall target="ocular:code-coverage:upload" />
     </target>
 
     <!--
@@ -86,7 +88,8 @@
         Lint check all php files, this task should be updated for each
         project so it only lint checks files specific for that project
     -->
-    <target name="lint">
+    <target name="lint"
+        description="Check the syntax of PHP files">
         <phplint cachefile="${project.basedir}/build/cache/phplint.cache">
             <fileset dir="${project.basedir}/">
                 <include name="**/*.php"/>
@@ -101,7 +104,8 @@
         phpunit - Runs phpunit with the phpunit.xml.dist file
         http://phpunit.de/
     -->
-    <target name="phpunit">
+    <target name="phpunit"
+        description="Runs unit tests">
         <exec executable="${project.bindir}/phpunit" passthru="true">
             <arg value="-c" />
             <arg path="${phpunit.configuration}" />
@@ -112,7 +116,8 @@
         PHP Mess Detector
         http://phpmd.org
     -->
-    <target name="phpmd">
+    <target name="phpmd"
+        description="Runs PHP Mess Detector">
         <delete file="${phpmd.report.file}" />
         <exec executable="${project.bindir}/phpmd" passthru="true">
             <arg path="${phpmd.source}" />
@@ -128,7 +133,8 @@
         the project is.
         https://github.com/sebastianbergmann/phploc
     -->
-    <target name="phploc">
+    <target name="phploc"
+        description="Calculates the size of the code base">
         <delete file="${phploc.log.csv}" />
         <delete file="${phploc.log.xml}" />
         <exec executable="${project.basedir}/bin/phploc" passthru="true">
@@ -143,7 +149,8 @@
         PHP Depend
         http://pdepend.org/
     -->
-    <target name="pdepend">
+    <target name="pdepend"
+        description="Generates some code metrics and pretty pictures">
         <delete file="${pdepend.jdepend.xml}" />
         <delete file="${pdepend.summary.xml}" />
         <exec executable="${project.bindir}/pdepend" passthru="true">
@@ -161,7 +168,8 @@
         needs to be updated for each project
         https://github.com/squizlabs/PHP_CodeSniffer
     -->
-    <target name="phpcs">
+    <target name="phpcs"
+        description="Runs PHP Code Sniffer to make sure your code doesn't smell">
         <delete file="${phpcs.report.xml}" />
         <exec executable="${project.bindir}/phpcs" passthru="true">
             <arg value="-p" /> <!-- Show progress of run -->

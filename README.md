@@ -1,6 +1,10 @@
 bitpay/default-build
 ====================
 
+The goal of the project is to create generic build scripts that can be dropped
+into almost any project and with a few small changes can be customized to the
+project.
+
 # Installation
 
 This assumes that you do not already have a build process in place. If you are

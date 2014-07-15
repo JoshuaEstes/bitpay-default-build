@@ -68,6 +68,24 @@
     </target>
 
     <!--
+        Generates documentation that can be uploaded to a web site and is meant
+        to be used elsewhere by the project.
+    -->
+    <target name="build-docs"
+        description="Generates documentation">
+        <fail message="Needs to be configured" />
+    </target>
+
+    <!--
+        Generates a distribution file that can then be used for uploading to
+        various plugin specific sites for users to download.
+    -->
+    <target name="build-dist"
+        description="Builds a distribution file">
+        <fail message="Needs to be configured" />
+    </target>
+
+    <!--
         Cleans up and makes sure that the build is
         clean
     -->

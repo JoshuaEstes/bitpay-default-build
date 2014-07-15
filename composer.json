@@ -1,6 +1,15 @@
 {
-    "name": "bitpay/default-build",
+    "name": "bitpay/",
+    "description": "",
+    "type": "library",
+    "keywords": [],
+    "homepage": "",
     "license": "MIT",
+    "support": {
+        "email": "support@bitpay.com",
+        "issues": "",
+        "source": ""
+    },
     "minimum-stability": "stable",
     "require": {},
     "require-dev": {

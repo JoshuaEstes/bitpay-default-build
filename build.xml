@@ -42,7 +42,7 @@
             <phingcall target="phpmd" />
             <phingcall target="phploc" />
             <phingcall target="pdepend" />
-            <phingcall target="phpdoc" />
+            <phingcall target="build-api-docs" />
         </parallel>
     </target>
 

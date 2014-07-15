@@ -7,25 +7,28 @@ project.
 
 # Installation
 
-This assumes that you do not already have a build process in place. If you are
-already using Phing, composer, etc. it is assumed that you are able to look at
-the source code of this project and update the files that you need to.
-
-* Copy everything into the root of your project.
-  * **NOTE** If you are already using composer, just update the `require-dev`
-    section with the contents of this projects.
-* Edit `build/phpunit.xml.dist` to point to your PHPUnit tests.
-* Edit `build/build.properties` and configure what needs to be configured
-  within that file.
-* Once everything is done, run composer to install all the dependencies.
+* Copy the `build` directory to your project.
+* Add the contents of the `.gitattributes` and `.gitignore` files to the ones
+  you already have. If you do not already have those files, just copy them
+  to your git repository.
+* If you are using Travis CI, copy `.travis.yml` into your project.
+* Copy the `build.xml` file into your project.
+* Copy the `require-dev` section of THIS projects `composer.json` into YOUR
+  projects `composer.json`
+* If you want a script that checks the server to make sure it has all the
+  requirements for your project, copy the `requirements.php` file into
+  your project.
 
 # Configuration
 
-The majority of the configuration options for running a build are inside of
-the `build.properties` file. Please update this file and read the descriptions
-of each property in that file.
-
-You may also need to update `phpunit.xml.dist`.
+* Edit `build/build.properties` to match your project. By default it assumes
+  your source code is in the project root directory.
+* Edit `build/phpunit.xml.dist` to match your directory structure. The logging
+  sections can be left alone unless you want the code coverage documentation
+  to be generated elsewhere.
+* Other files you may want to update include the `requirements.php` and the
+  `build.xml` script itself. Also update the `.travis.yml` file if your project
+  is using it.
 
 # Usage
 
